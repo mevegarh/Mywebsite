@@ -8,67 +8,54 @@
 /* 🔹 Body */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0; padding: 0;
+  margin:0; padding:0;
   background: linear-gradient(145deg, #1f2a38, #3a475a);
   color: #fff;
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+  display:flex; flex-direction:row; height:100vh; overflow:hidden;
 }
 
 /* 🔹 Loader */
 #loader {
   position: fixed; top:0; left:0; width:100%; height:100%;
   background: linear-gradient(135deg, #1f2a38, #3a475a);
-  display: flex; justify-content:center; align-items:center; flex-direction:column;
-  z-index: 9999; color:white;
+  display:flex; justify-content:center; align-items:center; flex-direction:column;
+  z-index:9999; color:white;
   transition: opacity 1s ease, visibility 1s;
 }
 #loader.fade-out { opacity:0; visibility:hidden; }
-.spinner {
-  border: 6px solid rgba(255,255,255,0.2);
-  border-top: 6px solid #00ffcc;
-  border-radius: 50%; width: 80px; height: 80px;
-  display: flex; justify-content:center; align-items:center;
-  animation: spin 1s linear infinite; margin-bottom:15px;
-  position: relative;
-}
+.spinner { border:6px solid rgba(255,255,255,0.2); border-top:6px solid #00ffcc; border-radius:50%; width:80px; height:80px; display:flex; justify-content:center; align-items:center; animation:spin 1s linear infinite; margin-bottom:15px; position:relative;}
 .spinner-text { position:absolute; font-size:30px; font-weight:bold; color:white; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes spin { 0% { transform:rotate(0deg);} 100% { transform:rotate(360deg);}}
 
 /* 🔹 Sidebar */
 #sidebar {
-  width: 220px; background: rgba(255,255,255,0.05);
+  width:250px; background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px); padding:20px;
-  display:flex; flex-direction:column;
-  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
+  display:flex; flex-direction:column; box-shadow:4px 0 20px rgba(0,0,0,0.3);
+  transition: all 0.3s ease; overflow-y:auto;
 }
-#sidebar h2 { margin-top:0; font-size:20px; margin-bottom:20px; text-align:center; }
+#sidebar h2 { margin-top:0; font-size:22px; margin-bottom:15px; text-align:center; }
 .folder-category {
-  padding:12px; margin-bottom:12px; background: rgba(255,255,255,0.1);
-  border-radius:10px; cursor:pointer; text-align:center;
-  transition: transform 0.3s, box-shadow 0.3s;
-  user-select:none;
+  padding:14px; margin-bottom:12px; background: rgba(255,255,255,0.1);
+  border-radius:10px; cursor:pointer; text-align:center; font-size:16px;
+  transition: transform 0.3s, box-shadow 0.3s; user-select:none;
 }
-.folder-category:hover { transform: translateY(-2px); box-shadow:0 4px 15px rgba(0,0,0,0.4); }
+.folder-category:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(0,0,0,0.4); }
 
 /* 🔹 Main content */
 #mainContent {
-  flex:1; padding:20px; overflow-y:auto;
-  display:flex; flex-direction:column;
+  flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column;
 }
 .app-header { text-align:center; font-size:28px; font-weight:700; margin-bottom:20px; }
 
 /* 🔹 Folder Cards */
 .folder, .deleted-folder {
-  padding:15px; margin-bottom:12px;
-  background: rgba(255,255,255,0.1); border-radius:12px;
-  text-align:center; cursor:pointer; font-weight:600;
+  padding:15px; margin-bottom:12px; background: rgba(255,255,255,0.1);
+  border-radius:12px; text-align:center; cursor:pointer; font-weight:600;
   backdrop-filter: blur(8px); transition: all 0.3s ease;
 }
-.folder:hover, .deleted-folder:hover { transform: translateY(-3px) scale(1.02); box-shadow:0 6px 20px rgba(0,0,0,0.5); }
-.deleted-folder { background: rgba(220, 53, 69, 0.5); }
+.folder:hover, .deleted-folder:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 6px 20px rgba(0,0,0,0.5);}
+.deleted-folder { background: rgba(220,53,69,0.5); }
 
 /* 🔹 Billing Page */
 #billingPage {
@@ -80,19 +67,28 @@ body {
 
 /* 🔹 Inputs & Buttons */
 input {
-  padding:10px; border:none; border-radius:8px; outline:none; font-size:15px;
+  padding:12px; border:none; border-radius:8px; outline:none; font-size:16px;
   margin-bottom:5px; background: rgba(255,255,255,0.1); color:white; box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
 }
 input::placeholder { color: rgba(255,255,255,0.6); }
 input[type="text"] { width:60%; } input[type="number"] { width:30%; text-align:right; } input[type="tel"] { width:60%; margin-right:5px; }
-button { padding:10px 20px; border:none; border-radius:12px; cursor:pointer; font-weight:600; margin-bottom:15px; width:100%; box-shadow:0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s; }
-button:hover { transform: translateY(-2px); }
-#addLineBtn { background:#00aaff; } #saveBtn { background:#28a745; } #deleteBtn { background:#f44336; } #callBtn { background:#007bff; } #smsBtn { background:#ffa500; } #backBtn { background:#6c757d; }
+button { padding:14px 20px; border:none; border-radius:12px; cursor:pointer; font-weight:600; margin-bottom:15px; width:100%; box-shadow:0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s; font-size:16px;}
+button:hover { transform: translateY(-2px);}
+#addLineBtn { background:#00aaff;} #saveBtn { background:#28a745;} #deleteBtn { background:#f44336;} #callBtn { background:#007bff;} #smsBtn { background:#ffa500;} #backBtn { background:#6c757d;}
 #total, #remaining { text-align:right; font-size:18px; font-weight:bold; margin-top:10px; }
-#givenMoney { width:200px; padding:8px; border-radius:5px; border:none; font-size:15px; text-align:right; margin-top:10px; }
+#givenMoney { width:100%; padding:10px; border-radius:8px; border:none; font-size:16px; text-align:right; margin-top:10px; }
 
-/* 🔹 Responsive */
-@media (max-width: 900px) { #sidebar{width:100%; flex-direction:row; overflow-x:auto;} #mainContent{flex:1;} }
+/* 🔹 Mobile Responsive */
+@media(max-width:800px){
+  body { flex-direction:column; }
+  #sidebar { width:100%; flex-direction:row; overflow-x:auto; padding:10px; height:auto;}
+  #sidebar h2{ display:none; }
+  .folder-category{ flex:0 0 auto; margin-right:8px; }
+  #mainContent{ padding:15px; }
+  .product-row{ flex-direction:column; align-items:flex-start;}
+  input[type="text"], input[type="number"], input[type="tel"]{ width:100%; margin-bottom:8px;}
+  button{ width:100%; margin-bottom:10px;}
+}
 </style>
 </head>
 <body>
@@ -105,7 +101,6 @@ button:hover { transform: translateY(-2px); }
 
 <!-- 🔹 Sidebar -->
 <div id="sidebar">
-  <h2>Folders</h2>
   <button onclick="createNewFolder()">+ New Folder</button>
   <div id="foldersList"></div>
 </div>
@@ -142,17 +137,16 @@ button:hover { transform: translateY(-2px); }
 
 <script>
 // Loader
-window.addEventListener("load",()=>{ setTimeout(()=>document.getElementById("loader").classList.add("fade-out"),2000); });
+window.addEventListener("load",()=>{ setTimeout(()=>document.getElementById("loader").classList.add("fade-out"),1500); });
 
 let currentFolder=null, products=[], total=0;
 
-// Load Folders
 function loadFolders() {
   const foldersList = document.getElementById("foldersList");
   foldersList.innerHTML="";
   const savedFolders=JSON.parse(localStorage.getItem("folders"))||[];
   savedFolders.forEach(f=>{
-    const div = document.createElement("div");
+    const div=document.createElement("div");
     div.className="folder-category"; div.textContent=f.name;
     div.setAttribute("draggable","true");
     div.addEventListener("click",()=>openFolderPage(f.name));
@@ -190,7 +184,6 @@ function createNewFolder(){
   localStorage.setItem("folders",JSON.stringify(folders));
   loadFolders();
 }
-
 function openFolderPage(name){
   currentFolder=name;
   document.getElementById("folderPage").style.display="none";
