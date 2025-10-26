@@ -405,7 +405,7 @@
       if(!phone) return alert("Please enter a phone number first.");
       const givenMoney = Number(document.getElementById("givenMoney").value) || 0;
       const remaining = total - givenMoney;
-      const message = `You have paid ₹${givenMoney} and you have to pay ₹${remaining}. Kudachi Mestri 8050671347. Thank you!`;
+      const message = `You have paid ₹${givenMoney} and you have to pay ₹${remaining} Kudachi mestri 8050671347`;
       window.location.href = `sms:${phone}?body=${encodeURIComponent(message)}`;
     }
   </script>
