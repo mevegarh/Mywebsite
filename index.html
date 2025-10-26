@@ -1,344 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>📁 Folder & Billing App (All in One)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-eCesOP0KMsNKVlpSklMrrbuiIQ8k7rNqWQF1_34Yw31spftkdnb4W4hRpKd4iLdkZag&usqp=CAU');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      color: #fff;
-    }
+<meta charset="UTF-8">
+<title>📁 Folder & Billing SaaS Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* 🔹 Body */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0; padding: 0;
+  background: linear-gradient(145deg, #1f2a38, #3a475a);
+  color: #fff;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-    }
+/* 🔹 Loader */
+#loader {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: linear-gradient(135deg, #1f2a38, #3a475a);
+  display: flex; justify-content:center; align-items:center; flex-direction:column;
+  z-index: 9999; color:white;
+  transition: opacity 1s ease, visibility 1s;
+}
+#loader.fade-out { opacity:0; visibility:hidden; }
+.spinner {
+  border: 6px solid rgba(255,255,255,0.2);
+  border-top: 6px solid #00ffcc;
+  border-radius: 50%; width: 80px; height: 80px;
+  display: flex; justify-content:center; align-items:center;
+  animation: spin 1s linear infinite; margin-bottom:15px;
+  position: relative;
+}
+.spinner-text { position:absolute; font-size:30px; font-weight:bold; color:white; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    #dateTime {
-      text-align: center;
-      font-size: 16px;
-      margin-bottom: 20px;
-      color: #ffe;
-    }
+/* 🔹 Sidebar */
+#sidebar {
+  width: 220px; background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px); padding:20px;
+  display:flex; flex-direction:column;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+#sidebar h2 { margin-top:0; font-size:20px; margin-bottom:20px; text-align:center; }
+.folder-category {
+  padding:12px; margin-bottom:12px; background: rgba(255,255,255,0.1);
+  border-radius:10px; cursor:pointer; text-align:center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  user-select:none;
+}
+.folder-category:hover { transform: translateY(-2px); box-shadow:0 4px 15px rgba(0,0,0,0.4); }
 
-    #container { display: flex; gap: 20px; flex-wrap: wrap; }
-    #mainContent { flex: 2; min-width: 280px; }
-    #deletedSection { flex: 1; min-width: 200px; }
+/* 🔹 Main content */
+#mainContent {
+  flex:1; padding:20px; overflow-y:auto;
+  display:flex; flex-direction:column;
+}
+.app-header { text-align:center; font-size:28px; font-weight:700; margin-bottom:20px; }
 
-    button {
-      padding: 10px 20px;
-      background: rgba(0,123,255,0.85);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 15px;
-      width: 100%;
-    }
+/* 🔹 Folder Cards */
+.folder, .deleted-folder {
+  padding:15px; margin-bottom:12px;
+  background: rgba(255,255,255,0.1); border-radius:12px;
+  text-align:center; cursor:pointer; font-weight:600;
+  backdrop-filter: blur(8px); transition: all 0.3s ease;
+}
+.folder:hover, .deleted-folder:hover { transform: translateY(-3px) scale(1.02); box-shadow:0 6px 20px rgba(0,0,0,0.5); }
+.deleted-folder { background: rgba(220, 53, 69, 0.5); }
 
-    button:hover { background: rgba(0,86,179,0.85); }
+/* 🔹 Billing Page */
+#billingPage {
+  display:none; background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px); color:white; padding:25px; border-radius:16px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+}
+.product-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background: rgba(255,255,255,0.08); padding:12px; border-radius:10px; flex-wrap:wrap; }
 
-    .folder, .deleted-folder {
-      padding: 10px 15px;
-      background: rgba(76, 175, 80, 0.85);
-      color: white;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      backdrop-filter: blur(4px);
-      text-align: center;
-      width: 100%;
-    }
+/* 🔹 Inputs & Buttons */
+input {
+  padding:10px; border:none; border-radius:8px; outline:none; font-size:15px;
+  margin-bottom:5px; background: rgba(255,255,255,0.1); color:white; box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+}
+input::placeholder { color: rgba(255,255,255,0.6); }
+input[type="text"] { width:60%; } input[type="number"] { width:30%; text-align:right; } input[type="tel"] { width:60%; margin-right:5px; }
+button { padding:10px 20px; border:none; border-radius:12px; cursor:pointer; font-weight:600; margin-bottom:15px; width:100%; box-shadow:0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s; }
+button:hover { transform: translateY(-2px); }
+#addLineBtn { background:#00aaff; } #saveBtn { background:#28a745; } #deleteBtn { background:#f44336; } #callBtn { background:#007bff; } #smsBtn { background:#ffa500; } #backBtn { background:#6c757d; }
+#total, #remaining { text-align:right; font-size:18px; font-weight:bold; margin-top:10px; }
+#givenMoney { width:200px; padding:8px; border-radius:5px; border:none; font-size:15px; text-align:right; margin-top:10px; }
 
-    .deleted-folder { background: rgba(220, 53, 69, 0.85); }
-
-    #folders, #deletedFolders {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* Billing Page */
-    #billingPage {
-      display: none;
-      background: linear-gradient(to right, #283E51, #485563);
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    .product-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,0.1);
-      padding: 10px;
-      border-radius: 6px;
-      flex-wrap: wrap;
-    }
-
-    input {
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-      outline: none;
-      font-size: 15px;
-      margin-bottom: 5px;
-    }
-
-    input[type="text"] { width: 60%; }
-    input[type="number"] { width: 30%; text-align: right; }
-    input[type="tel"] { width: 60%; margin-right: 5px; }
-
-    #addLineBtn { background: #00aaff; color: white; }
-    #saveBtn { background: #28a745; color: white; }
-    #deleteBtn { background: #f44336; color: white; }
-    #callBtn { background: #007bff; color: white; }
-    #smsBtn { background: #ffa500; color: white; }
-
-    #backBtn {
-      background: #6c757d;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      width: 100%;
-    }
-
-    #total, #remaining {
-      text-align: right;
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    #givenMoney {
-      width: 200px;
-      padding: 8px;
-      border-radius: 5px;
-      border: none;
-      font-size: 15px;
-      text-align: right;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 700px) {
-      #container { flex-direction: column; }
-      #mainContent, #deletedSection { min-width: 100%; }
-      #givenMoney { width: 100%; }
-    }
-  </style>
+/* 🔹 Responsive */
+@media (max-width: 900px) { #sidebar{width:100%; flex-direction:row; overflow-x:auto;} #mainContent{flex:1;} }
+</style>
 </head>
 <body>
-  <h1>📁 Folder & Billing App</h1>
 
-  <div id="folderPage">
-    <div id="container">
-      <div id="mainContent">
-        <button onclick="createNewFolder()">+ New Folder</button>
-        <div id="folders"></div>
-      </div>
-      <div id="deletedSection">
-        <div id="deletedFolders"></div>
-      </div>
-    </div>
-  </div>
+<!-- 🔹 Loader -->
+<div id="loader">
+  <div class="spinner"><div class="spinner-text">C</div></div>
+  <h2>Loading Folder & Billing Dashboard...</h2>
+</div>
+
+<!-- 🔹 Sidebar -->
+<div id="sidebar">
+  <h2>Folders</h2>
+  <button onclick="createNewFolder()">+ New Folder</button>
+  <div id="foldersList"></div>
+</div>
+
+<!-- 🔹 Main Content -->
+<div id="mainContent">
+  <div class="app-header">Folder & Billing App</div>
+
+  <!-- Folder Page -->
+  <div id="folderPage"></div>
 
   <!-- Billing Page -->
   <div id="billingPage">
     <button id="backBtn" onclick="showFolderPage()">⬅ Back</button>
     <h1 id="folderName"></h1>
     <div id="dateTime"></div>
-
     <div id="productsContainer"></div>
-
     <button id="addLineBtn" onclick="addProductLine()">+ New Line</button>
     <button id="saveBtn" onclick="saveFolder()">💾 Save Folder</button>
     <button id="deleteBtn" onclick="deleteFolder()">🗑 Delete Folder</button>
 
-    <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
+    <div style="margin-top:15px; display:flex; flex-wrap:wrap; gap:5px;">
       <input type="tel" id="customerPhone" placeholder="Customer Phone Number">
       <button id="callBtn" onclick="makeCall()">📞 Call</button>
       <button id="smsBtn" onclick="sendSMS()">💬 Send Message</button>
     </div>
-
     <div id="total">Total: ₹0</div>
-
-    <div style="margin-top: 10px;">
+    <div style="margin-top:10px;">
       <input type="number" id="givenMoney" placeholder="Enter Given Money ₹" oninput="updateBalance()">
     </div>
-
     <div id="remaining">Remaining: ₹0</div>
   </div>
+</div>
 
-  <script>
-    let currentFolder = null;
-    let products = [];
-    let total = 0;
+<script>
+// Loader
+window.addEventListener("load",()=>{ setTimeout(()=>document.getElementById("loader").classList.add("fade-out"),2000); });
 
-    window.onload = function () {
-      const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
-      savedFolders.forEach(folder => displayFolder(folder.name));
+let currentFolder=null, products=[], total=0;
 
-      const deletedFolders = JSON.parse(localStorage.getItem("deletedFolders")) || [];
-      deletedFolders.forEach(folder => displayDeletedFolder(folder.folderName, folder));
-    };
+// Load Folders
+function loadFolders() {
+  const foldersList = document.getElementById("foldersList");
+  foldersList.innerHTML="";
+  const savedFolders=JSON.parse(localStorage.getItem("folders"))||[];
+  savedFolders.forEach(f=>{
+    const div = document.createElement("div");
+    div.className="folder-category"; div.textContent=f.name;
+    div.setAttribute("draggable","true");
+    div.addEventListener("click",()=>openFolderPage(f.name));
+    div.addEventListener("dragstart",dragStart);
+    div.addEventListener("dragover",dragOver);
+    div.addEventListener("drop",dropFolder);
+    foldersList.appendChild(div);
+  });
+}
+window.onload=loadFolders;
 
-    function createNewFolder() {
-      const folderName = prompt("Enter Folder Name:");
-      if (!folderName) return;
-      let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
-      if (savedFolders.some(f => f.name === folderName)) {
-        alert("Folder already exists!");
-        return;
-      }
-      savedFolders.push({ name: folderName, products: [], total: 0, phone: "" });
-      localStorage.setItem("folders", JSON.stringify(savedFolders));
-      displayFolder(folderName);
-    }
+// Drag & Drop
+let dragged=null;
+function dragStart(e){ dragged=this; e.dataTransfer.effectAllowed="move"; }
+function dragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect="move"; }
+function dropFolder(e){
+  e.preventDefault();
+  if(dragged===this) return;
+  const folders=JSON.parse(localStorage.getItem("folders"))||[];
+  const names=folders.map(f=>f.name);
+  const dragIndex=names.indexOf(dragged.textContent);
+  const dropIndex=names.indexOf(this.textContent);
+  folders.splice(dropIndex,0,folders.splice(dragIndex,1)[0]);
+  localStorage.setItem("folders",JSON.stringify(folders));
+  loadFolders();
+}
 
-    function displayFolder(name) {
-      const folderDiv = document.createElement("div");
-      folderDiv.className = "folder";
-      folderDiv.innerText = name;
-      folderDiv.onclick = () => openFolderPage(name);
-      document.getElementById("folders").appendChild(folderDiv);
-    }
+// Folder Operations
+function createNewFolder(){
+  const folderName = prompt("Enter Folder Name:");
+  if(!folderName) return;
+  let folders=JSON.parse(localStorage.getItem("folders"))||[];
+  if(folders.some(f=>f.name===folderName)){ alert("Folder exists!"); return; }
+  folders.push({name:folderName,products:[],total:0,phone:""});
+  localStorage.setItem("folders",JSON.stringify(folders));
+  loadFolders();
+}
 
-    function openFolderPage(name) {
-      currentFolder = name;
-      document.getElementById("folderPage").style.display = "none";
-      document.getElementById("billingPage").style.display = "block";
-      document.getElementById("folderName").textContent = "📂 " + name;
+function openFolderPage(name){
+  currentFolder=name;
+  document.getElementById("folderPage").style.display="none";
+  document.getElementById("billingPage").style.display="block";
+  document.getElementById("folderName").textContent="📂 "+name;
+  const now=new Date();
+  document.getElementById("dateTime").textContent="🕒 "+now.toLocaleString();
+  const folders=JSON.parse(localStorage.getItem("folders"))||[];
+  const folder=folders.find(f=>f.name===name);
+  products=folder?.products||[];
+  const container=document.getElementById("productsContainer");
+  container.innerHTML=""; if(products.length===0)addProductLine(); else products.forEach(p=>addProductLine(p.name,p.price));
+  document.getElementById("customerPhone").value=folder?.phone||"";
+  document.getElementById("givenMoney").value=folder?.given||"";
+  updateTotal(); updateBalance();
+}
 
-      // ✅ Show current date and time
-      const now = new Date();
-      const formatted = now.toLocaleString();
-      document.getElementById("dateTime").textContent = "🕒 " + formatted;
+// Product Lines
+function addProductLine(name="",price=""){
+  const container=document.getElementById("productsContainer");
+  const row=document.createElement("div"); row.className="product-row";
+  const nameInput=document.createElement("input"); nameInput.type="text"; nameInput.placeholder="Enter product name"; nameInput.value=name;
+  const priceInput=document.createElement("input"); priceInput.type="number"; priceInput.placeholder="Price ₹"; priceInput.value=price;
+  priceInput.addEventListener("input",()=>{updateTotal(); updateBalance();});
+  priceInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") addProductLine();});
+  row.appendChild(nameInput); row.appendChild(priceInput); container.appendChild(row); updateTotal();
+}
 
-      let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
-      const folder = savedFolders.find(f => f.name === name);
-      products = folder?.products || [];
+// Calculations
+function updateTotal(){ const prices=document.querySelectorAll('#productsContainer input[type="number"]'); total=0; prices.forEach(p=>total+=Number(p.value)||0); document.getElementById("total").textContent="Total: ₹"+total.toLocaleString(); updateBalance();}
+function updateBalance(){ const given=Number(document.getElementById("givenMoney").value)||0; const remaining=total-given; document.getElementById("remaining").textContent="Remaining: ₹"+remaining.toLocaleString(); }
 
-      document.getElementById("productsContainer").innerHTML = "";
+// Save/Delete
+function saveFolder(){
+  const rows=document.querySelectorAll('.product-row');
+  products=Array.from(rows).map(r=>({name:r.querySelector('input[type="text"]').value, price:r.querySelector('input[type="number"]').value}));
+  const phone=document.getElementById("customerPhone").value;
+  const given=document.getElementById("givenMoney").value;
+  let folders=JSON.parse(localStorage.getItem("folders"))||[];
+  const index=folders.findIndex(f=>f.name===currentFolder);
+  if(index>-1){ folders[index].products=products; folders[index].phone=phone; folders[index].given=given; folders[index].total=products.reduce((sum,p)=>sum+Number(p.price||0),0);}
+  localStorage.setItem("folders",JSON.stringify(folders)); alert("✅ Folder saved successfully!"); loadFolders();
+}
+function deleteFolder(){ if(!confirm("Are you sure to delete?")) return; let folders=JSON.parse(localStorage.getItem("folders"))||[]; folders=folders.filter(f=>f.name!==currentFolder); localStorage.setItem("folders",JSON.stringify(folders)); alert("🗑 Folder deleted!"); showFolderPage(); loadFolders();}
+function showFolderPage(){ document.getElementById("billingPage").style.display="none"; document.getElementById("folderPage").style.display="block"; }
 
-      if (products.length === 0) {
-        addProductLine(); // ✅ Automatically add one blank line
-      } else {
-        products.forEach(p => addProductLine(p.name, p.price));
-      }
+// Call/SMS
+function makeCall(){ const phone=document.getElementById("customerPhone").value; if(!phone) return alert("Enter phone number."); window.location.href=`tel:${phone}`; }
+function sendSMS(){ const phone=document.getElementById("customerPhone").value; if(!phone) return alert("Enter phone number."); const remaining=total-(Number(document.getElementById("givenMoney").value)||0); const msg=`You have to pay ₹${remaining} Near Ugar Road Ainapur.`; window.location.href=`sms:${phone}?body=${encodeURIComponent(msg)}`;}
+</script>
 
-      document.getElementById("customerPhone").value = folder?.phone || "";
-      document.getElementById("givenMoney").value = folder?.given || "";
-      updateTotal();
-      updateBalance();
-    }
-
-    function addProductLine(name = "", price = "") {
-      const container = document.getElementById("productsContainer");
-      const row = document.createElement("div");
-      row.className = "product-row";
-
-      const nameInput = document.createElement("input");
-      nameInput.type = "text";
-      nameInput.placeholder = "Enter product name";
-      nameInput.value = name;
-
-      const priceInput = document.createElement("input");
-      priceInput.type = "number";
-      priceInput.placeholder = "Price ₹";
-      priceInput.value = price;
-
-      priceInput.addEventListener("input", () => {
-        updateTotal();
-        updateBalance();
-      });
-
-      row.appendChild(nameInput);
-      row.appendChild(priceInput);
-      container.appendChild(row);
-      updateTotal();
-    }
-
-    function updateTotal() {
-      const prices = document.querySelectorAll('#productsContainer input[type="number"]');
-      total = 0;
-      prices.forEach(p => total += Number(p.value) || 0);
-      document.getElementById("total").textContent = "Total: ₹" + total.toLocaleString();
-      updateBalance();
-    }
-
-    function updateBalance() {
-      const given = Number(document.getElementById("givenMoney").value) || 0;
-      const remaining = total - given;
-      document.getElementById("remaining").textContent = "Remaining: ₹" + remaining.toLocaleString();
-    }
-
-    function saveFolder() {
-      const rows = document.querySelectorAll('.product-row');
-      products = Array.from(rows).map(r => ({
-        name: r.querySelector('input[type="text"]').value,
-        price: r.querySelector('input[type="number"]').value
-      }));
-
-      const phone = document.getElementById("customerPhone").value;
-      const given = document.getElementById("givenMoney").value;
-
-      let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
-      const index = savedFolders.findIndex(f => f.name === currentFolder);
-      const totalAmount = products.reduce((sum, p) => sum + Number(p.price || 0), 0);
-
-      if (index > -1) {
-        savedFolders[index].products = products;
-        savedFolders[index].total = totalAmount;
-        savedFolders[index].phone = phone;
-        savedFolders[index].given = given;
-      }
-      localStorage.setItem("folders", JSON.stringify(savedFolders));
-      alert("✅ Folder saved successfully!");
-    }
-
-    function deleteFolder() {
-      if(confirm("Are you sure you want to delete this folder?")) {
-        let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
-        savedFolders = savedFolders.filter(f => f.name !== currentFolder);
-        localStorage.setItem("folders", JSON.stringify(savedFolders));
-        alert("🗑 Folder deleted successfully!");
-        showFolderPage();
-      }
-    }
-
-    function showFolderPage() {
-      document.getElementById("billingPage").style.display = "none";
-      document.getElementById("folderPage").style.display = "block";
-    }
-
-    function makeCall() {
-      const phone = document.getElementById("customerPhone").value;
-      if(!phone) return alert("Please enter a phone number.");
-      window.location.href = `tel:${phone}`;
-    }
-
-    function sendSMS() {
-      const phone = document.getElementById("customerPhone").value;
-      if(!phone) return alert("Please enter a phone number first.");
-      const total = Number(document.getElementById("total").textContent.replace(/\D/g,'')) || 0;
-      const given = Number(document.getElementById("givenMoney").value) || 0;
-      const remaining = total - given;
-      const message = `You have paid ₹${given} and you have to pay ₹${remaining} Kudachi Mestri 8050671347. Please pay fast via Cash or PhonePe.`;
-      window.location.href = `sms:${phone}?body=${encodeURIComponent(message)}`;
-    }
-  </script>
 </body>
 </html>
