@@ -6,13 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* 🔹 Loader */
-    #loader { position: fixed; inset: 0; background: linear-gradient(135deg, #1f1f1f, #3a3a3a);
-      display: flex; justify-content: center; align-items: center; flex-direction: column; color: white;
-      font-family: 'Segoe UI', sans-serif; z-index: 9999; transition: opacity 1s ease, visibility 1s;}
+    #loader { 
+      position: fixed; inset: 0; 
+      background: linear-gradient(135deg, #1f1f1f, #3a3a3a);
+      display: flex; justify-content: center; align-items: center; flex-direction: column; 
+      color: white; font-family: 'Segoe UI', sans-serif; 
+      z-index: 9999; transition: opacity 1s ease, visibility 1s;
+    }
     #loader.fade-out { opacity: 0; visibility: hidden; }
-    .spinner { border: 6px solid rgba(255,255,255,0.2); border-top: 6px solid #00ffcc;
-      border-radius: 50%; width: 80px; height: 80px; display: flex; justify-content: center; align-items: center;
-      animation: spin 1s linear infinite; margin-bottom: 15px; position: relative; }
+    .spinner { 
+      border: 6px solid rgba(255,255,255,0.2); border-top: 6px solid #00ffcc;
+      border-radius: 50%; width: 80px; height: 80px;
+      display: flex; justify-content: center; align-items: center;
+      animation: spin 1s linear infinite; margin-bottom: 15px; 
+    }
     .spinner-text { position: absolute; font-size: 30px; font-weight: bold; color: white; }
     @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
 
@@ -83,18 +90,48 @@
 
     #backBtn { background: #6c757d; }
 
+    /* 🔹 Video Section Styling */
     #videoSection { text-align: center; margin-top: auto; padding: 15px; }
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-      justify-content: center; align-items: center; }
-    .modal-content { position: relative; background: #000; border-radius: 10px; width: 90%; max-width: 600px; overflow: hidden; }
-    .close { position: absolute; top: 5px; right: 10px; color: white; font-size: 24px; cursor: pointer; }
-    video { width: 100%; height: auto; border: none; }
+    .modal { 
+      display: none; position: fixed; inset: 0; 
+      background: rgba(0,0,0,0.85);
+      justify-content: center; align-items: center; 
+      z-index: 2000;
+    }
+    .modal-content { 
+      position: relative; 
+      background: #000; 
+      border-radius: 12px; 
+      width: 90%; 
+      max-width: 700px;
+      max-height: 80vh; 
+      overflow: hidden; 
+      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+    }
+    .close { 
+      position: absolute; 
+      top: 8px; right: 14px; 
+      color: white; font-size: 26px; 
+      cursor: pointer; 
+      z-index: 10;
+      text-shadow: 0 0 5px black;
+    }
+    video { 
+      width: 100%; 
+      height: auto; 
+      border: none; 
+      max-height: 80vh; 
+      border-radius: 12px;
+    }
 
     @media (max-width: 500px) {
       .app-header { font-size: 22px; }
       .product-row { flex-direction: column; align-items: stretch; }
       input[type="text"], input[type="number"], input[type="tel"] { width: 100%; }
       button { font-size: 14px; padding: 10px; }
+      .modal-content { max-width: 95%; max-height: 70vh; }
     }
   </style>
 </head>
@@ -150,7 +187,7 @@
     <div class="modal-content">
       <span class="close" onclick="closeVideo()">&times;</span>
       <video id="tutorialVideo" controls>
-        <source src="fbe604dd-c1d4-412e-990e-297266af5b6b.mp4" type="video/mp4">
+        <source src="VN20251110_221720.mp4" type="video/mp4">
         Your browser does not support video playback.
       </video>
     </div>
@@ -237,13 +274,11 @@
       if(autoSave) saveFolderSilently();
     }
 
-    // ✅ Fixed function to subtract permanently from total
     function updateBalance(autoSave=false){
       const givenInput = document.getElementById("givenMoney");
       const given = toNumber(givenInput.value);
       const remElem = document.getElementById("remaining");
 
-      // subtract permanently
       total -= given;
       if(total < 0) total = 0;
 
@@ -286,8 +321,17 @@
       }
     }
 
-    function showFolderPage(){ document.getElementById("billingPage").style.display="none"; document.getElementById("folderPage").style.display="block"; }
-    function makeCall(){ const phone=document.getElementById("customerPhone").value; if(!phone)return alert("Please enter a phone number."); window.location.href=`tel:${phone}`; }
+    function showFolderPage(){ 
+      document.getElementById("billingPage").style.display="none"; 
+      document.getElementById("folderPage").style.display="block"; 
+    }
+
+    function makeCall(){ 
+      const phone=document.getElementById("customerPhone").value; 
+      if(!phone)return alert("Please enter a phone number."); 
+      window.location.href=`tel:${phone}`; 
+    }
+
     function sendSMS(){
       const phone=document.getElementById("customerPhone").value;
       if(!phone)return alert("Please enter a phone number first.");
@@ -298,8 +342,19 @@
       window.location.href=`sms:${phone}?body=${encodeURIComponent(message)}`;
     }
 
-    function openVideo(){ document.getElementById("videoModal").style.display="flex"; }
-    function closeVideo(){ document.getElementById("videoModal").style.display="none"; }
+    function openVideo(){ 
+      const modal = document.getElementById("videoModal");
+      const video = document.getElementById("tutorialVideo");
+      modal.style.display = "flex"; 
+      video.play();
+    }
+    function closeVideo(){ 
+      const modal = document.getElementById("videoModal");
+      const video = document.getElementById("tutorialVideo");
+      modal.style.display = "none"; 
+      video.pause();
+      video.currentTime = 0;
+    }
   </script>
 </body>
 </html>
