@@ -29,6 +29,7 @@
       background: linear-gradient(to bottom right, #121212, #232323);
       color: #fff; min-height: 100vh;
       display: flex; flex-direction: column;
+      cursor: url('https://cur.cursors-4u.net/others/oth-1/oth88.cur'), auto;
     }
 
     .app-header {
@@ -49,13 +50,15 @@
       cursor: pointer; margin-bottom: 15px; width: 100%;
       font-weight: 500; transition: all 0.3s ease;
     }
-    button:hover { transform: scale(1.03); }
+    button:hover { transform: scale(1.03); box-shadow: 0 0 10px #00aaff; }
 
     .folder {
       padding: 12px 15px; background: rgba(76,175,80,0.85);
       border-radius: 8px; margin-bottom: 10px; cursor: pointer;
-      text-align: center; font-weight: 500;
+      text-align: center; font-weight: 500; 
+      transition: all 0.3s ease;
     }
+    .folder:hover { transform: scale(1.05); box-shadow: 0 0 10px #4caf50; }
 
     #billingPage {
       display: none; background: linear-gradient(to right, #283E51, #485563);
@@ -126,6 +129,23 @@
       border-radius: 12px;
     }
 
+    /* 🔹 Animated Glowing Finger Pointer */
+    .glow-finger {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 36px;
+      animation: glow 1.5s infinite alternate;
+      color: #00ffcc;
+      filter: drop-shadow(0 0 10px #00ffcc);
+      z-index: 9999;
+    }
+
+    @keyframes glow {
+      from { transform: translateY(0px); opacity: 0.7; }
+      to { transform: translateY(-10px); opacity: 1; filter: drop-shadow(0 0 20px #00ffff); }
+    }
+
     @media (max-width: 500px) {
       .app-header { font-size: 22px; }
       .product-row { flex-direction: column; align-items: stretch; }
@@ -142,7 +162,7 @@
     <h2>Loading Folder & Billing App...</h2>
   </div>
 
-  <div class="app-header">Folder & Billing App</div>
+  <div class="app-header">📁 Folder & Billing App</div>
 
   <div id="folderPage">
     <div id="container">
@@ -193,33 +213,44 @@
     </div>
   </div>
 
+  <!-- 💡 Glowing Finger Pointer -->
+  <!-- <div class="glow-finger">👇</div> -->
+
   <script>
     // Loader
     window.addEventListener("load", () => {
       const loader = document.getElementById("loader");
       setTimeout(() => loader.classList.add("fade-out"), 2000);
     });
-
+  
     let currentFolder = null, products = [], total = 0;
-
+  
     function toNumber(val){ return isNaN(val) || val=="" ? 0 : Number(val); }
     function formatCurrency(num){ return Number(num).toLocaleString('en-IN'); }
-
+  
     window.onload = function(){
       const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
       savedFolders.forEach(folder => displayFolder(folder.name));
+      setTimeout(startAIGuide, 2500);
     };
-
+  
     function createNewFolder(){
       const folderName = prompt("Enter Folder Name:");
       if(!folderName) return;
       let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
       if(savedFolders.some(f => f.name === folderName)) return alert("Folder already exists!");
-      savedFolders.push({ name: folderName, products: [], total: 0, phone: "", given: 0 });
+      savedFolders.push({ 
+        name: folderName, 
+        products: [], 
+        total: 0, 
+        phone: "", 
+        given: 0,
+        dailyLogs: [] 
+      });
       localStorage.setItem("folders", JSON.stringify(savedFolders));
       displayFolder(folderName);
     }
-
+  
     function displayFolder(name){
       const folderDiv = document.createElement("div");
       folderDiv.className = "folder";
@@ -227,63 +258,77 @@
       folderDiv.onclick = () => openFolderPage(name);
       document.getElementById("folders").appendChild(folderDiv);
     }
-
+  
     function openFolderPage(name){
       currentFolder = name;
       document.getElementById("folderPage").style.display="none";
       document.getElementById("billingPage").style.display="block";
       document.getElementById("folderName").textContent = "📂 " + name;
-      document.getElementById("dateTime").textContent = "🕒 " + new Date().toLocaleString();
-
+  
+      const today = new Date().toLocaleDateString('en-IN');
+      document.getElementById("dateTime").textContent = "📅 " + today;
+  
       let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
       const folder = savedFolders.find(f => f.name === name);
       products = folder?.products || [];
-
+  
+      if (!folder.dailyLogs) folder.dailyLogs = [];
+      if (!folder.dailyLogs.includes(today)) {
+        folder.dailyLogs.push(today);
+        localStorage.setItem("folders", JSON.stringify(savedFolders));
+      }
+  
       const container = document.getElementById("productsContainer");
       container.innerHTML = "";
+  
+      const dateHeader = document.createElement("h3");
+      dateHeader.textContent = "🗓 Entries for " + today;
+      container.appendChild(dateHeader);
+  
       if(products.length === 0) addProductLine();
       else products.forEach(p => addProductLine(p.name, p.price));
-
+  
       document.getElementById("customerPhone").value = folder?.phone || "";
       updateTotal();
       updateBalance();
     }
-
+  
     function addProductLine(name = "", price = ""){
       const container = document.getElementById("productsContainer");
       const row = document.createElement("div");
       row.className = "product-row";
-
+  
       const nameInput = document.createElement("input");
       nameInput.type = "text"; nameInput.placeholder = "Enter product name"; nameInput.value = name;
-
+      nameInput.addEventListener("input", () => saveFolderSilently());
+  
       const priceInput = document.createElement("input");
       priceInput.type = "number"; priceInput.placeholder = "Price ₹"; priceInput.value = price;
       priceInput.addEventListener("input", () => updateTotal(true));
-
+  
       row.appendChild(nameInput);
       row.appendChild(priceInput);
       container.appendChild(row);
       updateTotal(true);
     }
-
+  
     function updateTotal(autoSave=false){
       const prices = document.querySelectorAll('#productsContainer input[type="number"]');
       total = 0; prices.forEach(p => total += toNumber(p.value));
       document.getElementById("total").textContent = "Total: ₹" + formatCurrency(total);
       if(autoSave) saveFolderSilently();
     }
-
+  
     function updateBalance(autoSave=false){
       const givenInput = document.getElementById("givenMoney");
       const given = toNumber(givenInput.value);
       const remElem = document.getElementById("remaining");
-
+  
       total -= given;
       if(total < 0) total = 0;
-
+  
       document.getElementById("total").textContent = "Total: ₹" + formatCurrency(total);
-
+  
       if(total > 0){
         remElem.textContent = "Remaining: ₹" + formatCurrency(total);
         remElem.className = "red";
@@ -291,47 +336,57 @@
         remElem.textContent = "✅ Fully Paid!";
         remElem.className = "green";
       }
-
+  
       remElem.classList.add("flash");
       setTimeout(()=>remElem.classList.remove("flash"), 250);
       givenInput.value = "";
-      if(autoSave) saveFolderSilently();
+      saveFolderSilently();
     }
-
+  
     function saveFolderSilently(){
       const rows = document.querySelectorAll('.product-row');
-      products = Array.from(rows).map(r=>({
-        name: r.querySelector('input[type="text"]').value,
-        price: toNumber(r.querySelector('input[type="number"]').value)
-      }));
+      products = Array.from(rows)
+        .filter(r => r.querySelector('input[type="text"]'))
+        .map(r=>({
+          name: r.querySelector('input[type="text"]').value,
+          price: toNumber(r.querySelector('input[type="number"]').value)
+        }));
       const phone = document.getElementById("customerPhone").value;
       let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
       const index = savedFolders.findIndex(f=>f.name===currentFolder);
-      if(index>-1){ savedFolders[index]={...savedFolders[index],products,total,phone}; }
+      if(index>-1){ 
+        savedFolders[index]={...savedFolders[index],products,total,phone}; 
+      }
       localStorage.setItem("folders", JSON.stringify(savedFolders));
     }
-
+  
+    document.addEventListener("input", e => {
+      if(e.target.id === "customerPhone") saveFolderSilently();
+    });
+  
     function saveFolder(){ saveFolderSilently(); alert("✅ Folder saved successfully!"); }
+  
     function deleteFolder(){
       if(confirm("Are you sure you want to delete this folder?")){
         let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
         savedFolders = savedFolders.filter(f=>f.name!==currentFolder);
         localStorage.setItem("folders", JSON.stringify(savedFolders));
-        alert("🗑 Folder deleted successfully!"); showFolderPage();
+        alert("🗑 Folder deleted successfully!");
+        showFolderPage();
       }
     }
-
+  
     function showFolderPage(){ 
       document.getElementById("billingPage").style.display="none"; 
       document.getElementById("folderPage").style.display="block"; 
     }
-
+  
     function makeCall(){ 
       const phone=document.getElementById("customerPhone").value; 
       if(!phone)return alert("Please enter a phone number."); 
       window.location.href=`tel:${phone}`; 
     }
-
+  
     function sendSMS(){
       const phone=document.getElementById("customerPhone").value;
       if(!phone)return alert("Please enter a phone number first.");
@@ -341,7 +396,7 @@
         : `✅ Fully Paid! — Kudachi mestri 8050671347`;
       window.location.href=`sms:${phone}?body=${encodeURIComponent(message)}`;
     }
-
+  
     function openVideo(){ 
       const modal = document.getElementById("videoModal");
       const video = document.getElementById("tutorialVideo");
@@ -355,6 +410,120 @@
       video.pause();
       video.currentTime = 0;
     }
+  
+    // 🩵 AI Hindi Voice + Glow + Finger Guide
+    function speakHindi(text, callback){
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "hi-IN";
+      utter.pitch = 1;
+      utter.rate = 1;
+      utter.onend = () => { if(callback) callback(); };
+      speechSynthesis.speak(utter);
+    }
+  
+    // finger emoji pointer
+    const aiFinger = document.createElement("div");
+    aiFinger.id = "aiFinger";
+    aiFinger.innerHTML = "🩵👉";
+    document.body.appendChild(aiFinger);
+  
+    const fingerStyle = document.createElement("style");
+    fingerStyle.textContent = `
+    #aiFinger {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 9999;
+    }`;
+    document.head.appendChild(fingerStyle);
+  
+    function moveFingerTo(el){
+      if(!el) return;
+      const rect = el.getBoundingClientRect();
+      aiFinger.style.left = (rect.left + window.scrollX + rect.width/2) + "px";
+      aiFinger.style.top = (rect.top + window.scrollY - 30) + "px";
+      aiFinger.style.opacity = 1;
+      aiFinger.style.transform = "translateY(-10px)";
+      setTimeout(()=>aiFinger.style.opacity=0, 3500);
+    }
+  
+    function glowElement(el){
+      if(!el) return;
+      el.style.boxShadow = "0 0 25px 5px #00ffff";
+      el.style.transition = "box-shadow 0.5s ease";
+      moveFingerTo(el);
+      setTimeout(()=> el.style.boxShadow = "", 4000);
+    }
+  
+    // step-by-step smart guide
+    function startAIGuide() {
+      const steps = [
+        {
+          el: document.querySelector("button[onclick='createNewFolder()']"),
+          text: "सबसे पहले 'न्यू फोल्डर' बटन पर क्लिक करें।",
+          waitFor: () => document.querySelectorAll('.folder').length > 0
+        },
+        {
+          el: document.getElementById("folders"),
+          text: "बहुत बढ़िया! अब आपका नया फोल्डर यहाँ दिखाई दे रहा है। उस पर क्लिक करें।",
+          waitFor: () => document.getElementById("billingPage").style.display === "block"
+        },
+        {
+          el: document.getElementById("productsContainer"),
+          text: "अब यहाँ प्रोडक्ट का नाम और प्राइस डालें।",
+          waitFor: () => {
+            const rows = document.querySelectorAll(".product-row input[type='text']");
+            return rows.length > 0 && rows[0].value.trim() !== "";
+          }
+        },
+        {
+          el: document.getElementById("customerPhone"),
+          text: "अब ग्राहक का फ़ोन नंबर यहाँ डालें।",
+          waitFor: () => document.getElementById("customerPhone").value.trim().length >= 10
+        },
+        {
+          el: document.getElementById("enterBtn"),
+          text: "अब ग्राहक ने जो पैसा दिया है, वो दर्ज करें और 'एंटर' दबाएं।",
+          waitFor: () => {
+            const rem = document.getElementById("remaining");
+            return rem.textContent.includes("✅") || rem.textContent.includes("Remaining");
+          }
+        },
+        {
+          el: document.querySelector("button[onclick='saveFolder()']"),
+          text: "सारा डेटा सेव करने के लिए 'सेव फोल्डर' बटन दबाएं।",
+          waitFor: () => false
+        },
+        {
+          el: document.querySelector("button[onclick='openVideo()']"),
+          text: "अगर अभी भी समझ न आये तो वीडियो देखें।",
+          waitFor: () => false
+        }
+      ];
+  
+      let i = 0;
+      function nextStep() {
+        if (i >= steps.length) return;
+        const { el, text, waitFor } = steps[i];
+        glowElement(el);
+        speakHindi(text, () => {
+          const check = setInterval(() => {
+            if (waitFor()) {
+              clearInterval(check);
+              i++;
+              setTimeout(nextStep, 500);
+            }
+          }, 1000);
+        });
+      }
+      nextStep();
+    }
+    
   </script>
+  
+  
+  
+  
 </body>
 </html>
