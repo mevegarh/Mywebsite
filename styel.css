@@ -1,0 +1,274 @@
+/* 🔹 Main QR Code Section */
+.main-qr-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  margin: 15px 0;
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.main-qr-section h3 {
+  margin-top: 0;
+  color: #00ffcc;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.qr-container {
+  margin: 15px 0;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-qr-message {
+  color: #ccc;
+  font-style: italic;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px dashed #666;
+}
+
+.qr-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.qr-buttons button {
+  width: auto;
+  padding: 10px 15px;
+  font-size: 14px;
+  margin: 5px;
+}
+
+/* QR Code Preview */
+.qr-preview {
+  border: 3px solid #4caf50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+/* 🔹 Loader */
+#loader { 
+  position: fixed; inset: 0; 
+  background: linear-gradient(135deg, #1f1f1f, #3a3a3a);
+  display: flex; justify-content: center; align-items: center; flex-direction: column; 
+  color: white; font-family: 'Segoe UI', sans-serif; 
+  z-index: 9999; transition: opacity 1s ease, visibility 1s;
+}
+#loader.fade-out { opacity: 0; visibility: hidden; }
+.spinner { 
+  border: 6px solid rgba(255,255,255,0.2); border-top: 6px solid #00ffcc;
+  border-radius: 50%; width: 80px; height: 80px;
+  display: flex; justify-content: center; align-items: center;
+  animation: spin 1s linear infinite; margin-bottom: 15px; 
+}
+.spinner-text { position: absolute; font-size: 30px; font-weight: bold; color: white; }
+@keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0; padding: 20px;
+  background: linear-gradient(to bottom right, #121212, #232323);
+  color: #fff; min-height: 100vh;
+  display: flex; flex-direction: column;
+  cursor: url('https://cur.cursors-4u.net/others/oth-1/oth88.cur'), auto;
+}
+
+.app-header {
+  text-align: center; font-size: 28px; font-weight: 600;
+  padding: 15px;
+  background: linear-gradient(135deg, #4a90e2, #8e44ad);
+  border-radius: 12px; margin-bottom: 20px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+#container { display: flex; gap: 20px; flex-wrap: wrap; }
+#mainContent { flex: 2; min-width: 280px; }
+
+button {
+  padding: 12px 20px;
+  background: linear-gradient(90deg, #007bff, #00aaff);
+  color: white; border: none; border-radius: 8px;
+  cursor: pointer; margin-bottom: 15px; width: 100%;
+  font-weight: 500; transition: all 0.3s ease;
+}
+button:hover { transform: scale(1.03); box-shadow: 0 0 10px #00aaff; }
+
+.folder {
+  padding: 12px 15px; background: rgba(76,175,80,0.85);
+  border-radius: 8px; margin-bottom: 10px; cursor: pointer;
+  text-align: center; font-weight: 500; 
+  transition: all 0.3s ease;
+}
+.folder:hover { transform: scale(1.05); box-shadow: 0 0 10px #4caf50; }
+
+#billingPage {
+  display: none; background: linear-gradient(to right, #283E51, #485563);
+  color: white; padding: 20px; border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.product-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; background: rgba(255,255,255,0.06);
+  padding: 10px; border-radius: 8px; flex-wrap: wrap; gap: 5px;
+}
+
+input {
+  padding: 10px; border: none; border-radius: 6px;
+  outline: none; font-size: 15px; margin-bottom: 5px;
+}
+input[type="text"] { flex: 1 1 60%; }
+input[type="number"] { flex: 1 1 30%; text-align: right; }
+input[type="tel"] { flex: 1 1 60%; margin-right: 5px; }
+
+#total, #remaining {
+  text-align: right; font-size: 18px; font-weight: bold; margin-top: 10px;
+  padding: 8px; border-radius: 6px;
+}
+#total { background: rgba(0,0,0,0.2); }
+#remaining.red { background: rgba(255,0,0,0.12); color: #ff6b6b; }
+#remaining.green { background: rgba(0,255,100,0.08); color: #00ff7f; }
+
+#remaining { transition: box-shadow 0.25s ease; }
+#remaining.flash { box-shadow: 0 0 8px rgba(255,255,255,0.15); transform: scale(1.01); }
+
+#backBtn { background: #6c757d; }
+
+/* Money History Styles */
+.money-history {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 8px;
+}
+.money-history h3 {
+  margin-top: 0;
+  color: #00ffcc;
+}
+.money-entry {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.money-entry:last-child {
+  border-bottom: none;
+}
+.money-date {
+  color: #ccc;
+}
+.money-amount {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Enhanced Money Subtraction Styles */
+.money-subtraction-feedback {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 255, 100, 0.9);
+  color: #000;
+  padding: 20px 40px;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 1000;
+  animation: moneySubtract 1.5s ease-out forwards;
+  box-shadow: 0 0 30px rgba(0, 255, 100, 0.5);
+}
+
+@keyframes moneySubtract {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  40% { transform: translate(-50%, -50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+.payment-summary {
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+/* 🔹 Video Section Styling */
+#videoSection { text-align: center; margin-top: auto; padding: 15px; }
+.modal { 
+  display: none; position: fixed; inset: 0; 
+  background: rgba(0,0,0,0.85);
+  justify-content: center; align-items: center; 
+  z-index: 2000;
+}
+.modal-content { 
+  position: relative; 
+  background: #000; 
+  border-radius: 12px; 
+  width: 90%; 
+  max-width: 700px;
+  max-height: 80vh; 
+  overflow: hidden; 
+  box-shadow: 0 0 25px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+}
+.close { 
+  position: absolute; 
+  top: 8px; right: 14px; 
+  color: white; font-size: 26px; 
+  cursor: pointer; 
+  z-index: 10;
+  text-shadow: 0 0 5px black;
+}
+video { 
+  width: 100%; 
+  height: auto; 
+  border: none; 
+  max-height: 80vh; 
+  border-radius: 12px;
+}
+
+/* 🔹 Animated Glowing Finger Pointer */
+.glow-finger {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 36px;
+  animation: glow 1.5s infinite alternate;
+  color: #00ffcc;
+  filter: drop-shadow(0 0 10px #00ffcc);
+  z-index: 9999;
+}
+
+@keyframes glow {
+  from { transform: translateY(0px); opacity: 0.7; }
+  to { transform: translateY(-10px); opacity: 1; filter: drop-shadow(0 0 20px #00ffff); }
+}
+
+@media (max-width: 500px) {
+  .app-header { font-size: 22px; }
+  .product-row { flex-direction: column; align-items: stretch; }
+  input[type="text"], input[type="number"], input[type="tel"] { width: 100%; }
+  button { font-size: 14px; padding: 10px; }
+  .modal-content { max-width: 95%; max-height: 70vh; }
+  .qr-buttons { flex-direction: column; }
+  .qr-buttons button { width: 100%; }
+  .main-qr-section {
+    margin: 10px 0;
+  }
+}
