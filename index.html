@@ -2,10 +2,43 @@
 <html lang="en">
 <head>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    // Add this script in head to configure AdMob
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-app-pub-9318416828954130/6914574932",
+      enable_page_level_ads: true,
+      overlays: {bottom: true}
+    });
+  </script>
   <meta charset="UTF-8">
   <title>📁 Folder & Billing App (All in One)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* 🔹 AdMob Banner Styling */
+    .ad-container {
+      width: 100%;
+      margin: 10px 0;
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .ad-container ins {
+      display: block !important;
+      margin: 0 auto;
+    }
+
+    .ad-label {
+      color: #ccc;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
     /* 🔹 Login Page Styles */
     #loginPage {
       position: fixed;
@@ -683,17 +716,16 @@
       </div>
     </div>
 
-    <!-- AdMob Banner Ad -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-app-pub-9318416828954130/6914574932"
-         data-ad-slot="ca-app-pub-9318416828954130/6914574932"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    <!-- AdMob Banner Ad - FIXED VERSION -->
+    <div class="ad-container">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle"
+           style="display:block; width: 100%; height: 100px;"
+           data-ad-client="ca-app-pub-9318416828954130/6914574932"
+           data-ad-slot="6914574932"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
 
     <div class="app-header">📁 Folder & Billing App</div>
 
@@ -810,21 +842,36 @@
   </div>
 
 <script>
+  // Improved AdMob initialization
+  function initializeAds() {
+    try {
+      // Initialize banner ad
+      (adsbygoogle = window.adsbygoogle || []).push({});
+      
+      console.log('AdMob initialized successfully');
+    } catch (e) {
+      console.log('AdMob Error: ', e);
+    }
+  }
+
   function showInterstitialAd() {
     try {
-      (adsbygoogle = window.adsbygoogle || []).push({
-        google_ad_client: "ca-app-pub-9318416828954130/6914574932",
-        enable_page_level_ads: true
-      });
+      // For interstitial ads, you need a different ad unit
+      // This is just a placeholder - you need to create a separate interstitial ad unit in AdMob
+      console.log('Interstitial ad would show here');
     } catch (e) {
-      console.log("AdMob Error: ", e);
+      console.log('Interstitial Ad Error: ', e);
     }
   }
 
   // Loader
   window.addEventListener("load", () => {
     const loader = document.getElementById("loader");
-    setTimeout(() => loader.classList.add("fade-out"), 2000);
+    setTimeout(() => {
+      loader.classList.add("fade-out");
+      // Initialize ads after page loads
+      setTimeout(initializeAds, 1000);
+    }, 2000);
   });
 
   let currentFolder = null, products = [], total = 0;
