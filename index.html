@@ -864,8 +864,7 @@
         // Show success message
         document.getElementById("loginMessage").textContent = "Account created successfully!";
         
-        // Send message
-        sendLoginMessage(shopName, phoneNumber);
+        // REMOVED: No longer sending message automatically on account creation
         
         // Hide login page and show main app after a delay
         setTimeout(function() {
@@ -919,14 +918,7 @@
     document.getElementById('accountButton').addEventListener('click', toggleAccountDropdown);
   });
 
-  function sendLoginMessage(shopName, phoneNumber) {
-    // Create the message
-    // const message = `You have to pay XYZ money plz pay fast to ${shopName} number ${phoneNumber}`;
-    
-    // Use SMS API to send the message
-    // Note: This will open the default SMS app on the device
-    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
-  }
+  // REMOVED: The sendLoginMessage function is no longer needed for account creation
 
   function initializeApp() {
     const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
@@ -1334,4 +1326,3 @@
 </script>
 </body>
 </html>
-
