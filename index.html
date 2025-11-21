@@ -279,6 +279,56 @@
       background: #545b62;
     }
     
+    /* 🔹 Payment Date Section */
+    .payment-date-section {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    
+    .payment-date-section h3 {
+      margin-top: 0;
+      color: #00ffcc;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    
+    .date-input-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    
+    .date-input-group input {
+      flex: 1;
+      min-width: 120px;
+    }
+    
+    .date-info {
+      margin-top: 10px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .date-info.active {
+      background: rgba(255, 193, 7, 0.2);
+      border-left: 4px solid #ffc107;
+    }
+    
+    .date-info.expired {
+      background: rgba(220, 53, 69, 0.2);
+      border-left: 4px solid #dc3545;
+    }
+    
+    .date-info.completed {
+      background: rgba(40, 167, 69, 0.2);
+      border-left: 4px solid #28a745;
+    }
+    
     /* 🔹 Main QR Code Section */
     .main-qr-section {
       background: rgba(255, 255, 255, 0.1);
@@ -556,6 +606,9 @@
         width: 280px;
         right: -10px;
       }
+      .date-input-group {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -691,6 +744,18 @@
       <button onclick="saveFolder()">💾 Save Folder</button>
       <button onclick="deleteFolder()">🗑 Delete Folder</button>
 
+      <!-- Payment Date Section -->
+      <div class="payment-date-section">
+        <h3>📅 Payment Date Reminder</h3>
+        <div class="date-input-group">
+          <input type="number" id="paymentDays" placeholder="Days to pay (e.g., 2, 3, 5)" min="1" max="30">
+          <button onclick="setPaymentDate()" style="background:#ff9800;">Set Payment Date</button>
+        </div>
+        <div id="paymentDateInfo" class="date-info">
+          No payment date set
+        </div>
+      </div>
+
       <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
         <input type="tel" id="customerPhone" placeholder="Customer Phone Number">
         <button onclick="makeCall()">📞 Call</button>
@@ -764,6 +829,7 @@
 
   let currentFolder = null, products = [], total = 0;
   let userData = null;
+  let paymentReminderInterval = null;
 
   function toNumber(val){ return isNaN(val) || val=="" ? 0 : Number(val); }
   function formatCurrency(num){ return Number(num).toLocaleString('en-IN'); }
@@ -804,6 +870,11 @@
       document.getElementById("mainApp").style.display = "none";
       document.getElementById("loginPage").style.display = "flex";
       closeAccountDropdown();
+      
+      // Clear any running intervals
+      if (paymentReminderInterval) {
+        clearInterval(paymentReminderInterval);
+      }
     }
   }
 
@@ -825,6 +896,140 @@
     }
   }
 
+  // Payment Date Functions
+  function setPaymentDate() {
+    const days = parseInt(document.getElementById('paymentDays').value);
+    if (!days || days < 1) {
+      alert('Please enter a valid number of days');
+      return;
+    }
+
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(today.getDate() + days);
+    
+    const paymentDateInfo = {
+      setDate: today.toISOString(),
+      dueDate: dueDate.toISOString(),
+      days: days,
+      messageSent: false
+    };
+
+    // Save to current folder
+    let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
+    const folderIndex = savedFolders.findIndex(f => f.name === currentFolder);
+    
+    if (folderIndex > -1) {
+      savedFolders[folderIndex].paymentDateInfo = paymentDateInfo;
+      localStorage.setItem("folders", JSON.stringify(savedFolders));
+      updatePaymentDateDisplay(paymentDateInfo);
+      alert(`Payment reminder set for ${days} day(s) from now`);
+    }
+  }
+
+  function updatePaymentDateDisplay(paymentDateInfo) {
+    const infoElement = document.getElementById('paymentDateInfo');
+    
+    if (!paymentDateInfo) {
+      infoElement.textContent = 'No payment date set';
+      infoElement.className = 'date-info';
+      return;
+    }
+
+    const dueDate = new Date(paymentDateInfo.dueDate);
+    const today = new Date();
+    const timeDiff = dueDate - today;
+    const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    
+    let status = 'active';
+    let message = '';
+    
+    if (daysRemaining < 0) {
+      status = 'expired';
+      message = `Payment was due ${Math.abs(daysRemaining)} day(s) ago`;
+    } else if (daysRemaining === 0) {
+      status = 'active';
+      message = 'Payment is due today';
+    } else {
+      status = 'active';
+      message = `Payment due in ${daysRemaining} day(s) - ${dueDate.toLocaleDateString()}`;
+    }
+
+    // Check if payment is completed
+    const remaining = total - getTotalGivenMoney();
+    if (remaining <= 0) {
+      status = 'completed';
+      message = '✅ Payment completed!';
+    }
+
+    infoElement.textContent = message;
+    infoElement.className = `date-info ${status}`;
+    
+    // Auto-send message if due date has passed and message not sent
+    if (daysRemaining < 0 && !paymentDateInfo.messageSent && remaining > 0) {
+      sendAutoReminder();
+      // Mark as sent
+      paymentDateInfo.messageSent = true;
+      let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
+      const folderIndex = savedFolders.findIndex(f => f.name === currentFolder);
+      if (folderIndex > -1) {
+        savedFolders[folderIndex].paymentDateInfo = paymentDateInfo;
+        localStorage.setItem("folders", JSON.stringify(savedFolders));
+      }
+    }
+  }
+
+  function sendAutoReminder() {
+    const phone = document.getElementById("customerPhone").value;
+    if (!phone) {
+      console.log('No phone number to send auto reminder');
+      return;
+    }
+
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    if (!userData) {
+      console.log('No user data found');
+      return;
+    }
+
+    const remaining = total - getTotalGivenMoney();
+    let message = `🔔 REMINDER: Payment of ₹${formatCurrency(remaining)} is overdue! `;
+    message += `Please pay immediately to ${userData.shopName} (${userData.phoneNumber}). `;
+    message += `Thank you!`;
+    
+    // In a real app, you would use a server to send SMS
+    // For demo purposes, we'll just show an alert
+    alert(`Auto-reminder would be sent to: ${phone}\n\nMessage: ${message}`);
+    
+    // Uncomment the line below to actually send SMS (opens messaging app)
+    // window.location.href = `sms:${phone}?body=${encodeURIComponent(message)}`;
+  }
+
+  // Check all folders for payment reminders
+  function checkAllPaymentReminders() {
+    const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
+    const today = new Date();
+    
+    savedFolders.forEach(folder => {
+      if (folder.paymentDateInfo) {
+        const dueDate = new Date(folder.paymentDateInfo.dueDate);
+        const timeDiff = dueDate - today;
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        
+        // Calculate remaining balance for this folder
+        const totalGiven = folder.givenMoney ? 
+          folder.givenMoney.reduce((sum, entry) => sum + entry.amount, 0) : 0;
+        const remaining = folder.total - totalGiven;
+        
+        // If overdue and not sent and still has balance
+        if (daysRemaining < 0 && !folder.paymentDateInfo.messageSent && remaining > 0) {
+          // In a real app, you would send the reminder here
+          console.log(`Auto reminder needed for: ${folder.name}`);
+        }
+      }
+    });
+  }
+
   // Login Functionality
   document.addEventListener('DOMContentLoaded', function() {
     // Check if user has already logged in
@@ -837,6 +1042,12 @@
       document.getElementById("mainApp").style.display = "block";
       updateAccountDisplay();
       initializeApp();
+      
+      // Check for payment reminders
+      checkAllPaymentReminders();
+      
+      // Set up interval to check reminders periodically
+      paymentReminderInterval = setInterval(checkAllPaymentReminders, 60000); // Check every minute
     } else {
       // Show login page
       document.getElementById("loginPage").style.display = "flex";
@@ -864,14 +1075,15 @@
         // Show success message
         document.getElementById("loginMessage").textContent = "Account created successfully!";
         
-        // REMOVED: No longer sending message automatically on account creation
-        
         // Hide login page and show main app after a delay
         setTimeout(function() {
           document.getElementById("loginPage").style.display = "none";
           document.getElementById("mainApp").style.display = "block";
           updateAccountDisplay();
           initializeApp();
+          
+          // Set up interval to check reminders periodically
+          paymentReminderInterval = setInterval(checkAllPaymentReminders, 60000);
         }, 2000);
       } else {
         document.getElementById("loginMessage").textContent = "Please fill all fields!";
@@ -917,8 +1129,6 @@
     // Account button click event
     document.getElementById('accountButton').addEventListener('click', toggleAccountDropdown);
   });
-
-  // REMOVED: The sendLoginMessage function is no longer needed for account creation
 
   function initializeApp() {
     const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
@@ -1089,10 +1299,14 @@
     else products.forEach(p => addProductLine(p.name, p.price));
 
     document.getElementById("customerPhone").value = folder?.phone || "";
+    document.getElementById("paymentDays").value = "";
     updateTotal();
     updateBalance();
     displayMoneyHistory();
     updatePaymentSummary();
+    
+    // Update payment date display
+    updatePaymentDateDisplay(folder?.paymentDateInfo);
   }
 
   function addProductLine(name = "", price = ""){
@@ -1120,6 +1334,13 @@
     document.getElementById("total").textContent = "Total: ₹" + formatCurrency(total);
     if(autoSave) saveFolderSilently();
     updatePaymentSummary();
+    
+    // Update payment date display to reflect payment status
+    let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
+    const folder = savedFolders.find(f => f.name === currentFolder);
+    if (folder && folder.paymentDateInfo) {
+      updatePaymentDateDisplay(folder.paymentDateInfo);
+    }
   }
 
   function updateBalance(autoSave=false){
@@ -1148,6 +1369,13 @@
     saveFolderSilently();
     displayMoneyHistory();
     updatePaymentSummary();
+    
+    // Update payment date display to reflect payment status
+    let savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
+    const folder = savedFolders.find(f => f.name === currentFolder);
+    if (folder && folder.paymentDateInfo) {
+      updatePaymentDateDisplay(folder.paymentDateInfo);
+    }
   }
 
   function showMoneySubtractionFeedback(amount) {
