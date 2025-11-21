@@ -919,14 +919,14 @@
     document.getElementById('accountButton').addEventListener('click', toggleAccountDropdown);
   });
 
-  // function sendLoginMessage(shopName, phoneNumber) {
-  //   // Create the message
-  //   // const message = `You have to pay XYZ money plz pay fast to ${shopName} number ${phoneNumber}`;
+  function sendLoginMessage(shopName, phoneNumber) {
+    // Create the message
+    // const message = `You have to pay XYZ money plz pay fast to ${shopName} number ${phoneNumber}`;
     
-  //   // Use SMS API to send the message
-  //   // Note: This will open the default SMS app on the device
-  //   window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
-  // }
+    // Use SMS API to send the message
+    // Note: This will open the default SMS app on the device
+    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+  }
 
   function initializeApp() {
     const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
@@ -1334,3 +1334,4 @@
 </script>
 </body>
 </html>
+
