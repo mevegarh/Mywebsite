@@ -509,6 +509,7 @@
   });
 
   let currentFolder = null, products = [], total = 0;
+  let userData = null;
 
   function toNumber(val){ return isNaN(val) || val=="" ? 0 : Number(val); }
   function formatCurrency(num){ return Number(num).toLocaleString('en-IN'); }
@@ -516,10 +517,11 @@
   // Login Functionality
   document.addEventListener('DOMContentLoaded', function() {
     // Check if user has already logged in
-    const userData = localStorage.getItem("userData");
+    const savedUserData = localStorage.getItem("userData");
     
-    if (userData) {
+    if (savedUserData) {
       // User already logged in, show main app
+      userData = JSON.parse(savedUserData);
       document.getElementById("loginPage").style.display = "none";
       document.getElementById("mainApp").style.display = "block";
       initializeApp();
@@ -538,7 +540,7 @@
       
       if (userName && shopName && phoneNumber) {
         // Save user data
-        const userData = {
+        userData = {
           userName: userName,
           shopName: shopName,
           phoneNumber: phoneNumber,
@@ -939,13 +941,27 @@
     window.location.href=`tel:${phone}`; 
   }
 
+  // UPDATED SMS FUNCTION - Now uses shop details from login
   function sendSMS(){
     const phone=document.getElementById("customerPhone").value;
     if(!phone)return alert("Please enter a phone number first.");
+    
+    // Get user data from localStorage
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    if (!userData) {
+      alert("No user data found. Please log in again.");
+      return;
+    }
+    
     const remaining = total - getTotalGivenMoney();
-    let message = remaining > 0 
-      ? `You have to pay ₹${formatCurrency(remaining)} — Kudachi mestri 8050671347`
-      : `✅ Fully Paid! — Kudachi mestri 8050671347`;
+    let message = "";
+    
+    if (remaining > 0) {
+      message = `You have to pay ₹${formatCurrency(remaining)}. Please pay fast to ${userData.shopName} number ${userData.phoneNumber}`;
+    } else {
+      message = `✅ Fully Paid! Thank you for your payment to ${userData.shopName}.`;
+    }
+    
     window.location.href=`sms:${phone}?body=${encodeURIComponent(message)}`;
   }
 
